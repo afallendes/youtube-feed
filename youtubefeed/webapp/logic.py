@@ -51,9 +51,16 @@ class YouTubeChannel:
         Request RSS and stores last feed update.
         """
 
-        def pre_append_namespace(s):
-            """Helper to pre append a namespace to an string"""
-            return '{http://www.w3.org/2005/Atom}' + s
+        def pans(namespace:str, s:str) -> str:
+            """Pre Append NameSpace. Helper to pre append a namespace to an string"""
+            if namespace == 'atom':
+                return '{http://www.w3.org/2005/Atom}' + s
+            elif namespace == 'yt':
+                return '{http://www.youtube.com/xml/schemas/2015}' + s
+            elif namespace == 'media':
+                return '{http://search.yahoo.com/mrss/}' + s
+            else:
+                raise ValueError("Invalid namespace: " + namespace)
 
         today = datetime.now()
 
@@ -64,18 +71,22 @@ class YouTubeChannel:
         self.xml = root # Just for Debug
         
         # Find all videos in this channels' feed
-        entries = root.findall(pre_append_namespace('entry'))
+        entries = root.findall(pans('atom', 'entry'))
         for entry in entries:
             self.feedItems.append({
                 # Get video UID
-                "uid": entry.find(pre_append_namespace('id')).text.replace('yt:video:', ''),
-                # Get video Title
-                "title": entry.find(pre_append_namespace('title')).text,
+                "uid": entry.find(pans('atom', 'id')).text.replace('yt:video:', ''),
                 # Get video URL
-                "url": entry.find(pre_append_namespace('link')).get('href'),
+                "url": entry.find(pans('atom', 'link')).get('href'),
+                # Get video title
+                "title": entry.find(pans('atom', 'title')).text,
+                # Get video description
+                "description": entry.find(pans('media', 'group')).find(pans('media', 'description')).text,
+                # Get video thumbnail URL
+                "thumbnail": entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url'),
                 # Get video published date
                 "published": datetime.strptime(
-                    entry.find(pre_append_namespace('published')).text,
+                    entry.find(pans('atom', 'published')).text,
                     '%Y-%m-%dT%H:%M:%S%z'
                 ),
                 # Add video last time checked date
