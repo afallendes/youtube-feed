@@ -49,6 +49,8 @@ class YouTubeChannel:
             """Helper to pre append a namespace to an string"""
             return '{http://www.w3.org/2005/Atom}' + s
 
+        today = datetime.now()
+
         response = requests.get(self.rss)
         content = response.content.decode('utf-8')
         root = ET.fromstring(content)
@@ -64,5 +66,6 @@ class YouTubeChannel:
                 "published": datetime.strptime(
                     entry.find(pre_append_namespace('published')).text,
                     '%Y-%m-%dT%H:%M:%S%z'
-                )
+                ),
+                "last_check": today
             })
