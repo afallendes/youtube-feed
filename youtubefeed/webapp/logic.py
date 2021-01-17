@@ -9,8 +9,8 @@ BASE_URL = 'https://www.youtube.com'
 class YouTubeChannel:
     def __init__(self, url):
         if any([
-            url.startswith(BASE_URL + '/c/'),
-            url.startswith(BASE_URL + '/channel/')
+            url.startswith(BASE_URL + '/c/') and len(url) > len(BASE_URL + '/c/'),
+            url.startswith(BASE_URL + '/channel/') and len(url) > len(BASE_URL + '/channel/')
         ]):
             self.url = url
             self.feedItems = []
@@ -23,7 +23,7 @@ class YouTubeChannel:
         """
         response = requests.get(self.url)
 
-        if response.status_code == '200':
+        if response.status_code == 200:
             content = response.content.decode('utf-8')
 
             # Get UID and Title
@@ -44,7 +44,10 @@ class YouTubeChannel:
             if BASE_URL + '/c/' in self.url:
                 self.url = BASE_URL + '/channel/' + self.uid
         
-        raise ValueError('Invalid channel URL. Channel does not exist.\nURL: ' + self.url) 
+        elif response.status_code == 404:
+            raise ValueError('Invalid channel URL. Channel does not exist.\nURL: ' + self.url) 
+        else:
+            raise ValueError('Error when trying to reach channel URL.\nURL: ' + self.url) 
     
     def update(self):
         """
@@ -65,30 +68,38 @@ class YouTubeChannel:
         today = datetime.now()
 
         response = requests.get(self.feedURL)
-        content = response.content.decode('utf-8')
-        root = ET.fromstring(content)
-        
-        self.xml = root # Just for Debug
-        
-        # Find all videos in this channels' feed
-        entries = root.findall(pans('atom', 'entry'))
-        for entry in entries:
-            self.feedItems.append({
-                # Get video UID
-                "uid": entry.find(pans('atom', 'id')).text.replace('yt:video:', ''),
-                # Get video URL
-                "url": entry.find(pans('atom', 'link')).get('href'),
-                # Get video title
-                "title": entry.find(pans('atom', 'title')).text,
-                # Get video description
-                "description": entry.find(pans('media', 'group')).find(pans('media', 'description')).text,
-                # Get video thumbnail URL
-                "thumbnail": entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url'),
-                # Get video published date
-                "published": datetime.strptime(
-                    entry.find(pans('atom', 'published')).text,
-                    '%Y-%m-%dT%H:%M:%S%z'
-                ),
-                # Add video last time checked date
-                "last_check": today
-            })
+
+        if response.status_code == 200:
+            
+            content = response.content.decode('utf-8')
+            root = ET.fromstring(content)
+            
+            self.xml = root # Just for Debug
+            
+            # Find all videos in this channels' feed
+            entries = root.findall(pans('atom', 'entry'))
+            for entry in entries:
+                self.feedItems.append({
+                    # Get video UID
+                    "uid": entry.find(pans('atom', 'id')).text.replace('yt:video:', ''),
+                    # Get video URL
+                    "url": entry.find(pans('atom', 'link')).get('href'),
+                    # Get video title
+                    "title": entry.find(pans('atom', 'title')).text,
+                    # Get video description
+                    "description": entry.find(pans('media', 'group')).find(pans('media', 'description')).text,
+                    # Get video thumbnail URL
+                    "thumbnail": entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url'),
+                    # Get video published date
+                    "published": datetime.strptime(
+                        entry.find(pans('atom', 'published')).text,
+                        '%Y-%m-%dT%H:%M:%S%z'
+                    ),
+                    # Add video last time checked date
+                    "last_check": today
+                })
+
+        elif response.status_code == 404:
+            raise ValueError('Invalid channel XML URL. Channel feed does not exist.\nURL: ' + self.url) 
+        else:
+            raise ValueError('Error when trying to reach channel XML feed URL.\nURL: ' + self.url) 
