@@ -13,7 +13,7 @@ class YouTubeChannel:
             url.startswith(BASE_URL + '/channel/')
         ]):
             self.url = url
-            self.feed = []
+            self.feedItems = []
         else:
             raise ValueError('Invalid channel URL: ' + url)
     
@@ -38,7 +38,7 @@ class YouTubeChannel:
             self.avatar = re_search.group('avatar')
 
             # Construct Feed URL
-            self.rss = BASE_URL + '/feeds/videos.xml?channel_id=' + self.uid
+            self.feedURL = BASE_URL + '/feeds/videos.xml?channel_id=' + self.uid
 
             # Construct cannonical channel URL (if required)
             if BASE_URL + '/c/' in self.url:
@@ -57,7 +57,7 @@ class YouTubeChannel:
 
         today = datetime.now()
 
-        response = requests.get(self.rss)
+        response = requests.get(self.feedURL)
         content = response.content.decode('utf-8')
         root = ET.fromstring(content)
         
@@ -66,7 +66,7 @@ class YouTubeChannel:
         # Find all videos in this channels' feed
         entries = root.findall(pre_append_namespace('entry'))
         for entry in entries:
-            self.feed.append({
+            self.feedItems.append({
                 # Get video UID
                 "uid": entry.find(pre_append_namespace('id')).text.replace('yt:video:', ''),
                 # Get video Title
