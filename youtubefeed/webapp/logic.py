@@ -13,7 +13,7 @@ class YouTubeChannel:
             url.startswith(BASE_URL + '/channel/') and len(url) > len(BASE_URL + '/channel/')
         ]):
             self.url = url
-            self.feedItems = []
+            self.feedEntries = []
         else:
             raise ValueError('Invalid channel URL: ' + url)
     
@@ -79,22 +79,31 @@ class YouTubeChannel:
             # Find all videos in this channels' feed
             entries = root.findall(pans('atom', 'entry'))
             for entry in entries:
-                self.feedItems.append({
-                    # Get video UID
-                    "uid": entry.find(pans('atom', 'id')).text.replace('yt:video:', ''),
-                    # Get video URL
-                    "url": entry.find(pans('atom', 'link')).get('href'),
-                    # Get video title
-                    "title": entry.find(pans('atom', 'title')).text,
-                    # Get video description
-                    "description": entry.find(pans('media', 'group')).find(pans('media', 'description')).text,
-                    # Get video thumbnail URL
-                    "thumbnail": entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url'),
-                    # Get video published date
-                    "published": datetime.strptime(
-                        entry.find(pans('atom', 'published')).text,
-                        '%Y-%m-%dT%H:%M:%S%z'
-                    ),
+                # Get video UID
+                uid = entry.find(pans('atom', 'id')).text.replace('yt:video:', '')
+                # Get video URL
+                url = entry.find(pans('atom', 'link')).get('href')
+                # Get video title
+                title = entry.find(pans('atom', 'title')).text
+                # Get video description
+                description = entry.find(pans('media', 'group')).find(pans('media', 'description')).text
+                if len(description) > 200:
+                    description = description[:195] + '(...)'
+                # Get video thumbnail URL
+                thumbnail = entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url')
+                # Get video published date
+                published = datetime.strptime(
+                    entry.find(pans('atom', 'published')).text,
+                    '%Y-%m-%dT%H:%M:%S%z'
+                )
+
+                self.feedEntries.append({
+                    "uid": uid,
+                    "url": url,
+                    "title": title,
+                    "description": description,
+                    "thumbnail": thumbnail,
+                    "published": published,
                     # Add video last time checked date
                     "last_check": today
                 })
