@@ -27,7 +27,7 @@ class YouTubeChannel:
             content = response.content.decode('utf-8')
 
             # Get UID and Title
-            re_pattern = r'\"channelId\":\"(?P<uid>\w*)",\"title\":\"(?P<title>.*)\",\"navigationEndpoint\"'
+            re_pattern = r'\"channelId\":\"(?P<uid>[a-zA-Z0-9-_]*)",\"title\":\"(?P<title>.*)\",\"navigationEndpoint\"'
             re_search = re.search(re_pattern, content)
             self.uid = re_search.group('uid')
             self.title = re_search.group('title')
@@ -74,7 +74,7 @@ class YouTubeChannel:
             content = response.content.decode('utf-8')
             root = ET.fromstring(content)
             
-            self.xml = root # Just for Debug
+            #self.xml = root # Just for Debug
             
             # Find all videos in this channels' feed
             entries = root.findall(pans('atom', 'entry'))
@@ -91,6 +91,7 @@ class YouTubeChannel:
                     description = description[:195] + '(...)'
                 # Get video thumbnail URL
                 thumbnail = entry.find(pans('media', 'group')).find(pans('media', 'thumbnail')).get('url')
+                thumbnail = thumbnail.replace('default', '720')
                 # Get video published date
                 published = datetime.strptime(
                     entry.find(pans('atom', 'published')).text,
