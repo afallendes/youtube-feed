@@ -6,7 +6,7 @@ import requests
 
 BASE_URL = 'https://www.youtube.com'
 
-class YouTubeChannel:
+class YouTubeChannelScraper:
     def __init__(self, url):
         if any([
             url.startswith(BASE_URL + '/c/') and len(url) > len(BASE_URL + '/c/'),
