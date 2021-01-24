@@ -3,5 +3,6 @@ from django.urls import path
 from webapp import views
 
 urlpatterns = [
-    path('hello_world', views.hello_world, name='hello_world'),
+    path('add_channel', views.add_channel, name='add_channel'),
+    path('', views.list_videos, name='list_videos')
 ]

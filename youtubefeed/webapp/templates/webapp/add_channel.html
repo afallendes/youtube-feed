@@ -1,0 +1,25 @@
+{% extends 'webapp/base.html' %}
+
+{% load static %}
+
+{% block body %}
+<div class="container mt-3">
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.url.errors }}
+            {{ form.url.label_tag }}
+            {{ form.url }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", (event) => {
+    document.getElementById("id_url").classList.add("form-control");
+    document.getElementById("id_url").setAttribute("placeholder", "https://www.youtube.com/channel/UCHnyfMqiRRG1u-2MsSQLbXA");
+});
+</script>
+{% endblock body %}
+
