@@ -1,0 +1,35 @@
+{% extends 'webapp/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock title %}
+
+{% block body %}
+<nav class="navbar navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand align-middle" href="{{ url }}">
+      <img src="https://www.youtube.com/s/desktop/80d87ec4/img/favicon_48.png" alt="" height="36" class="d-inline-block align-top">
+      YouTube Feed
+    </a>
+  </div>
+</nav>
+
+<div class="container my-3">
+    {% for entry in videos %}
+    <div class="card mb-3" style="height: 150px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{ entry.thumbnail }}" alt="..." height="150">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{{ entry.url }}">{{ entry.title }}</a></h5>
+                    <p class="card-text">{{ entry.description }}</p>
+                    <p class="card-text"><small class="text-muted">{{ entry.published }}</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock body %}

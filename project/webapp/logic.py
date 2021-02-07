@@ -4,13 +4,13 @@ from datetime import datetime
 
 import requests
 
-BASE_URL = 'https://www.youtube.com'
+YOUTUBE_BASE_URL = 'https://www.youtube.com'
 
 class YouTubeChannelScraper:
     def __init__(self, url):
         if any([
-            url.startswith(BASE_URL + '/c/') and len(url) > len(BASE_URL + '/c/'),
-            url.startswith(BASE_URL + '/channel/') and len(url) > len(BASE_URL + '/channel/')
+            url.startswith(YOUTUBE_BASE_URL + '/c/') and len(url) > len(YOUTUBE_BASE_URL + '/c/'),
+            url.startswith(YOUTUBE_BASE_URL + '/channel/') and len(url) > len(YOUTUBE_BASE_URL + '/channel/')
         ]):
             self.url = url
             self.feedEntries = []
@@ -38,11 +38,11 @@ class YouTubeChannelScraper:
             self.avatar = re_search.group('avatar')
 
             # Construct Feed URL
-            self.feedURL = BASE_URL + '/feeds/videos.xml?channel_id=' + self.uid
+            self.feedURL = YOUTUBE_BASE_URL + '/feeds/videos.xml?channel_id=' + self.uid
 
             # Construct cannonical channel URL (if required)
-            if BASE_URL + '/c/' in self.url:
-                self.url = BASE_URL + '/channel/' + self.uid
+            if YOUTUBE_BASE_URL + '/c/' in self.url:
+                self.url = YOUTUBE_BASE_URL + '/channel/' + self.uid
         
         elif response.status_code == 404:
             raise ValueError('Invalid channel URL. Channel does not exist.\nURL: ' + self.url) 
