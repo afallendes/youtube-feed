@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from webapp.models import YoutubeChannel, YoutubeVideo
+from webapp.models import Channel, Video
 
-@admin.register(YoutubeChannel)
-class YoutubeChannelAdmin(admin.ModelAdmin):
+@admin.register(Channel)
+class ChannelAdmin(admin.ModelAdmin):
     list_display = ('uid', 'title')
 
-@admin.register(YoutubeVideo)
-class YoutubeVideoAdmin(admin.ModelAdmin):
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
     list_display = ('uid', 'channel' , 'title')

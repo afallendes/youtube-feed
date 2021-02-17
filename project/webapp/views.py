@@ -4,12 +4,12 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import AddChannelForm
 from .logic import YouTubeChannelScraper
-from .models import YoutubeChannel, YoutubeVideo, User
+from .models import Channel, Video, User
 
 @login_required
 def list_videos(request):
     if request.method == 'GET':
-        videos = YoutubeVideo.objects.filter(user=request.user)
+        videos = Video.objects.filter(user=request.user)
         return render(request, 'webapp/list_videos.html', {'videos': videos})
 
 def add_channel(request):
@@ -23,8 +23,8 @@ def add_channel(request):
 
             user = User.objects.get(username=request.user)
 
-            if not YoutubeChannel.objects.filter(uid=channel.uid).exists():      
-                channel_db = YoutubeChannel(
+            if not Channel.objects.filter(uid=channel.uid).exists():      
+                channel_db = Channel(
                     user=user,
                     uid=channel.uid,
                     url=channel.url,
@@ -33,11 +33,11 @@ def add_channel(request):
                 )
                 channel_db.save()
             else:
-                channel_db = YoutubeChannel.objects.get(uid=channel.uid)
+                channel_db = Channel.objects.get(uid=channel.uid)
             
             for video in channel.feedEntries:
-                if not YoutubeChannel.objects.filter(uid=video['uid']).exists():
-                    video_db = YoutubeVideo(
+                if not Channel.objects.filter(uid=video['uid']).exists():
+                    video_db = Video(
                         user=user,
                         channel=channel_db,
                         uid=video['uid'],
