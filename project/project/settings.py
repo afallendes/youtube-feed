@@ -23,7 +23,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, [])
 )
 
-env.read_env(env_file=(BASE_DIR.parent / '.env').as_posix())
+env.read_env(env_file=(BASE_DIR.parent/ 'config' / '.env').as_posix())
 
 
 # Quick-start development settings - unsuitable for production
@@ -85,11 +85,14 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': {}
+}
+
+if env('DEBUG'):
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
 
 
 # Password validation
