@@ -1,5 +1,6 @@
-.venv
-.env
-youtubefeed/db.sqlite3
-__pycache__
-migrations
+.venv/
+.vscode/
+config/.env
+project/**/__pycache__/
+project/**/migrations/
+project/db.sqlite3
